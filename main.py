@@ -1,14 +1,29 @@
+import os
+import requests
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+load_dotenv()
+
 app = FastAPI()
+
+HF_TOKEN = os.getenv("HF_TOKEN")
+HF_API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn"
 
 class TextRequest(BaseModel):
     text: str
 
-def fake_ai_summarize(text: str) -> str:
-    words = text.split()
-    return " ".join(words[:15]) + "..." if len(words) > 15 else text
+def ai_summarize(text: str) -> str:
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+    payload = {"inputs": text}
+    response = requests.post(HF_API_URL, headers=headers, json=payload)
+
+    if response.status_code != 200:
+        return f"Error from HuggingFace API: {response.status_code} - {response.text}"
+
+    result = response.json()
+    return result[0]["summary_text"]
 
 @app.get("/")
 def root():
@@ -16,5 +31,5 @@ def root():
 
 @app.post("/summarize")
 def summarize(req: TextRequest):
-    summary = fake_ai_summarize(req.text)
+    summary = ai_summarize(req.text)
     return {"summary": summary}
