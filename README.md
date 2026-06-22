@@ -50,3 +50,4 @@ uvicorn main:app --reload
 
 Built to get hands-on with the practical side of DevOps, containerization, and AI integration, going beyond tutorials by actually deploying something real.
 
+
