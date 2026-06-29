@@ -14,7 +14,7 @@ Send any block of text to the /summarize endpoint, and it returns a genuinely AI
 - Docker and Docker Compose - containerization, multi-service orchestration, restart policies, health checks
 - Pydantic - request validation
 - python-dotenv - environment variable management
-- Coming next: GitHub Actions CI/CD, cloud deployment, image size optimization
+- Coming next: GitHub Actions CI/CD, cloud deployment
 
 ## How Caching Works
 
@@ -32,6 +32,18 @@ docker ps                          # container shows healthy, running for some t
 curl http://localhost:8000/crash   # deliberately kill the process
 sleep 3
 docker ps                          # same container, uptime reset to a few seconds - it restarted automatically
+
+## Image Size Optimization
+
+Compared three approaches to measure actual impact on image size:
+
+| Image | Disk usage | Content size |
+|---|---|---|
+| Full python:3.11 base image | 1.64GB | 421MB |
+| python:3.11-slim base image | 260MB | 62.6MB |
+| python:3.11-slim with multi-stage build | 243MB | 58.6MB |
+
+Switching from the full Python base image to the slim variant gave a roughly 6x reduction in image size. A multi-stage build was also tested, giving a further modest improvement (about 6.5% smaller), but the gain was limited because this project's dependencies (FastAPI, Redis client, Pydantic, requests) are lightweight pure-Python packages without heavy build-time tooling to strip out. Given the small additional gain, the project sticks with the simpler single-stage slim build for maintainability.
 
 ## Running Locally with Docker
 
@@ -61,10 +73,10 @@ docker compose up --build
 - [x] Dockerize the app
 - [x] Add Redis caching to avoid redundant AI calls on repeated text
 - [x] Add a self-healing demo (deliberate crash + automatic Docker restart)
-- [ ] Optimize Docker image size (multi-stage build comparison)
+- [x] Optimize Docker image size (multi-stage build comparison)
 - [ ] CI/CD pipeline via GitHub Actions
 - [ ] Live cloud deployment (Render/Railway)
 
 ## Why This Project
 
-Built to get hands-on with the practical side of DevOps, containerization, and AI integration, going beyond tutorials by actually deploying something real and debugging real issues along the way, including a deprecated API endpoint migration, a caching logic bug, and verifying container self-healing behavior firsthand.
+Built to get hands-on with the practical side of DevOps, containerization, and AI integration, going beyond tutorials by actually deploying something real and debugging real issues along the way, including a deprecated API endpoint migration, a caching logic bug, and verifying container self-healing and image size tradeoffs firsthand.
