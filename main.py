@@ -58,3 +58,7 @@ def summarize(req: TextRequest):
         cache.set(key, summary, ex=3600)
 
     return {"summary": summary, "cached": False}
+
+@app.get("/crash")
+def crash():
+    os._exit(1)
