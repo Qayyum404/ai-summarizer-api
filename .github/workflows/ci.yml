@@ -1,0 +1,23 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t summarizer-api .
+
+      - name: Run container and smoke test
+        run: |
+          docker network create test-net
+          docker run -d --name redis-test --network test-net redis:7-alpine
+          docker run -d --name api-test --network test-net -p 8000:8000 \
+            -e REDIS_HOST=redis-test \
+            -e HF_TOKEN=${{ secrets.HF_TOKEN }} \
+            summarizer-api
+          sleep 5
+          curl -f http://localhost:8000/ || exit 1
