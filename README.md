@@ -74,7 +74,7 @@ docker compose up --build
 - [x] Add Redis caching to avoid redundant AI calls on repeated text
 - [x] Add a self-healing demo (deliberate crash + automatic Docker restart)
 - [x] Optimize Docker image size (multi-stage build comparison)
-- [ ] CI/CD pipeline via GitHub Actions
+- [x] CI/CD pipeline via GitHub Actions
 - [ ] Live cloud deployment (Render/Railway)
 
 ## Why This Project
