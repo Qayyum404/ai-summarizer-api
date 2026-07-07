@@ -15,7 +15,14 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 HF_API_URL = "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn"
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-cache = redis.Redis(host=REDIS_HOST, port=6379, decode_responses=True)
+
+try:
+    cache = redis.Redis(host=REDIS_HOST, port=6379, decode_responses=True)
+    cache.ping()
+    REDIS_AVAILABLE = True
+except Exception:
+    REDIS_AVAILABLE = False
+    cache = None
 
 class TextRequest(BaseModel):
     text: str
@@ -43,18 +50,20 @@ def call_huggingface(text: str):
 
 @app.get("/")
 def root():
-    return {"status": "running"}
+    return {"status": "running", "redis": REDIS_AVAILABLE}
 
 @app.post("/summarize")
 def summarize(req: TextRequest):
     key = hashlib.sha256(req.text.encode()).hexdigest()
-    cached = cache.get(key)
-    if cached:
-        return {"summary": cached, "cached": True}
+
+    if REDIS_AVAILABLE and cache:
+        cached = cache.get(key)
+        if cached:
+            return {"summary": cached, "cached": True}
 
     summary, success = call_huggingface(req.text)
 
-    if success:
+    if REDIS_AVAILABLE and cache and success:
         cache.set(key, summary, ex=3600)
 
     return {"summary": summary, "cached": False}

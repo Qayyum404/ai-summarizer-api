@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: ai-summarizer-api
+    runtime: docker
+    plan: free
+    envVars:
+      - key: HF_TOKEN
+        sync: false
