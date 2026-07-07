@@ -45,6 +45,12 @@ Compared three approaches to measure actual impact on image size:
 
 Switching from the full Python base image to the slim variant gave a roughly 6x reduction in image size. A multi-stage build was also tested, giving a further modest improvement (about 6.5% smaller), but the gain was limited because this project's dependencies (FastAPI, Redis client, Pydantic, requests) are lightweight pure-Python packages without heavy build-time tooling to strip out. Given the small additional gain, the project sticks with the simpler single-stage slim build for maintainability.
 
+## Live Demo
+
+https://ai-summarizer-api-ge8q.onrender.com/docs
+
+Note: free tier spins down after inactivity — first request may take 50+ seconds to wake up.
+
 ## Running Locally with Docker
 
 1. Clone the repo:
@@ -75,7 +81,7 @@ docker compose up --build
 - [x] Add a self-healing demo (deliberate crash + automatic Docker restart)
 - [x] Optimize Docker image size (multi-stage build comparison)
 - [x] CI/CD pipeline via GitHub Actions
-- [ ] Live cloud deployment (Render/Railway)
+- [x] Live cloud deployment (Render/Railway)
 
 ## Why This Project
 
